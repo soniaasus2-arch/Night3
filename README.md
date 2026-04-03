@@ -1,58 +1,7 @@
 --[[
-    DAVI HUB - Night 3
-    Com sistema de key, notificações e toggles On/Off (otimizado)
+    DAVI HUB - Night 3 (Estável)
+    Sem notificações durante o carregamento para evitar travamentos
 ]]
-
--- ========== SISTEMA DE NOTIFICAÇÕES ==========
-local function notificar(titulo, texto, cor, duracao)
-    duracao = duracao or 3
-    cor = cor or Color3.fromRGB(255, 140, 0)
-    
-    local gui = Instance.new("ScreenGui")
-    gui.Name = "Notificacao"
-    gui.Parent = game:GetService("CoreGui")
-    gui.ResetOnSpawn = false
-    
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 300, 0, 60)
-    frame.Position = UDim2.new(1, -310, 0, 10)
-    frame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-    frame.BackgroundTransparency = 0.1
-    frame.BorderSizePixel = 0
-    frame.Parent = gui
-    
-    local titleLbl = Instance.new("TextLabel")
-    titleLbl.Size = UDim2.new(1, -10, 0, 25)
-    titleLbl.Position = UDim2.new(0, 5, 0, 5)
-    titleLbl.Text = titulo
-    titleLbl.TextColor3 = cor
-    titleLbl.BackgroundTransparency = 1
-    titleLbl.Font = Enum.Font.GothamBold
-    titleLbl.TextSize = 14
-    titleLbl.TextXAlignment = Enum.TextXAlignment.Left
-    titleLbl.Parent = frame
-    
-    local msgLbl = Instance.new("TextLabel")
-    msgLbl.Size = UDim2.new(1, -10, 0, 25)
-    msgLbl.Position = UDim2.new(0, 5, 0, 30)
-    msgLbl.Text = texto
-    msgLbl.TextColor3 = Color3.fromRGB(200, 200, 200)
-    msgLbl.BackgroundTransparency = 1
-    msgLbl.Font = Enum.Font.Gotham
-    msgLbl.TextSize = 12
-    msgLbl.TextXAlignment = Enum.TextXAlignment.Left
-    msgLbl.Parent = frame
-    
-    -- Animação de entrada
-    frame:TweenPosition(UDim2.new(1, -10, 0, 10), Enum.TweenDirection.Out, Enum.TweenInfo.new(0.3), true)
-    
-    task.wait(duracao)
-    
-    -- Animação de saída
-    frame:TweenPosition(UDim2.new(1, 10, 0, 10), Enum.TweenDirection.Out, Enum.TweenInfo.new(0.3), true)
-    task.wait(0.3)
-    gui:Destroy()
-end
 
 -- ========== SISTEMA DE KEY ==========
 local key = "DAVI2024"
@@ -101,16 +50,14 @@ errorLabel.Parent = frame
 btn.MouseButton1Click:Connect(function()
     if box.Text == key then
         keyGui:Destroy()
-        notificar("✅ KEY VÁLIDA", "Hub carregando...", Color3.fromRGB(100, 255, 100), 2)
         carregarHub()
     else
         box.Text = ""
         errorLabel.Text = "❌ Key inválida! Tente novamente."
-        notificar("❌ KEY INVÁLIDA", "A key digitada está incorreta", Color3.fromRGB(255, 100, 100), 3)
     end
 end)
 
--- ========== HUB PRINCIPAL (OTIMIZADO) ==========
+-- ========== HUB PRINCIPAL ==========
 function carregarHub()
     local player = game.Players.LocalPlayer
     local coreGui = game:GetService("CoreGui")
@@ -220,7 +167,6 @@ function carregarHub()
     layout.Padding = UDim.new(0, 8)
     layout.Parent = s
 
-    -- Funções auxiliares
     function btn(txt, cb)
         local bt = Instance.new("TextButton")
         bt.Size = UDim2.new(0.9, 0, 0, 40)
@@ -228,10 +174,7 @@ function carregarHub()
         bt.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
         bt.TextColor3 = Color3.fromRGB(255, 255, 255)
         bt.Parent = s
-        bt.MouseButton1Click:Connect(function()
-            cb()
-            notificar("📌 TELEPORT", "Teleportado para " .. txt, Color3.fromRGB(255, 200, 100), 2)
-        end)
+        bt.MouseButton1Click:Connect(cb)
         bt.MouseEnter:Connect(function() bt.BackgroundColor3 = Color3.fromRGB(255, 140, 0) end)
         bt.MouseLeave:Connect(function() bt.BackgroundColor3 = Color3.fromRGB(45, 45, 60) end)
     end
@@ -261,7 +204,6 @@ function carregarHub()
             bt.BackgroundColor3 = st and Color3.fromRGB(255, 140, 0) or Color3.fromRGB(80, 80, 100)
             bt.TextColor3 = st and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(255, 100, 100)
             cb(st)
-            notificar("⚙️ CONFIG", txt .. " " .. (st and "ativado" or "desativado"), Color3.fromRGB(100, 200, 255), 2)
         end)
     end
 
@@ -273,17 +215,17 @@ function carregarHub()
         end
     end
 
-    -- Auto Munição (otimizada)
+    -- Auto Munição
     local function autoMunicao()
         local char = player.Character or player.CharacterAdded:Wait()
         local root = char:WaitForChild("HumanoidRootPart")
         local shotgun = char:FindFirstChild("Shotgun") or player.Backpack:FindFirstChild("Shotgun")
         if not shotgun then
-            notificar("⚠️ ATENÇÃO", "Nenhuma shotgun encontrada. Tentando coletar mesmo assim...", Color3.fromRGB(255, 200, 100), 2)
+            warn("⚠️ Nenhuma shotgun encontrada")
         end
         local ammoPiles = workspace:FindFirstChild("AmmoPiles")
         if not ammoPiles then
-            notificar("❌ ERRO", "Pasta 'AmmoPiles' não encontrada", Color3.fromRGB(255, 100, 100), 2)
+            warn("❌ Pasta 'AmmoPiles' não encontrada")
             return
         end
         local ammoPile = nil
@@ -294,7 +236,7 @@ function carregarHub()
             end
         end
         if not ammoPile then
-            notificar("❌ ERRO", "Nenhuma pilha de munição disponível", Color3.fromRGB(255, 100, 100), 2)
+            warn("❌ Nenhuma pilha de munição disponível")
             return
         end
         local detector = ammoPile.Detector
@@ -306,10 +248,10 @@ function carregarHub()
             fireclickdetector(click)
             task.wait(0.1)
         end
-        notificar("🔫 MUNIÇÃO", "Coletada! Voltando em 1.5s...", Color3.fromRGB(100, 200, 255), 2)
+        print("🔫 Munição coletada! Voltando em 1.5s...")
         task.wait(1.5)
         root.CFrame = CFrame.new(originalPos)
-        notificar("✅ RETORNO", "Voltou à posição original", Color3.fromRGB(100, 255, 100), 2)
+        print("✅ Retornado à posição original.")
     end
 
     -- Stamina
@@ -365,7 +307,7 @@ function carregarHub()
         end
     end
 
-    -- ESP Worker e Aranha (persistente, otimizado)
+    -- ESP Worker e Aranha
     local function addNPCESP(npc, cor)
         if not npc or npc:FindFirstChild("ESP_NPC") then return end
         local h = Instance.new("Highlight")
@@ -412,9 +354,7 @@ function carregarHub()
     btn("🛡️ Safe Spot", function() teleport(Vector3.new(194.0, 38.7, -217.4)) end)
     btn("🏠 Lodge", function() teleport(Vector3.new(-226.8, 17.4, 103.7)) end)
     btn("🌿 Jeffry Canna", function() teleport(Vector3.new(177.5, 4.3, 197.9)) end)
-
-    -- ========== AUTO MUNIÇÃO ==========
-    btn("🔫 Auto Coletar Munição (volta em 1.5s)", autoMunicao)
+    btn("🔫 Auto Coletar Munição", autoMunicao)
 
     -- ========== TOGGLES ==========
     tog("⚡ Infinite Stamina", false, setStamina)
@@ -429,6 +369,5 @@ function carregarHub()
     end
     s.CanvasSize = UDim2.new(0, 0, 0, totalH + 30)
 
-    notificar("🎉 HUB CARREGADO", "DAVI HUB - Night 3 pronto para uso!", Color3.fromRGB(255, 140, 0), 3)
-    print("✅ DAVI HUB - Night 3 carregado (otimizado, com notificações)")
+    print("✅ DAVI HUB - Night 3 carregado com sucesso!")
 end
