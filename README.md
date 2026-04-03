@@ -1,4 +1,42 @@
---[[
+-- Sistema de key simples
+local key = "DAVI2024"  -- 
+
+local userInput = nil
+local gui = Instance.new("ScreenGui")
+gui.Parent = game:GetService("CoreGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 300, 0, 150)
+frame.Position = UDim2.new(0.5, -150, 0.5, -75)
+frame.BackgroundColor3 = Color3.fromRGB(30,30,40)
+frame.Parent = gui
+
+local label = Instance.new("TextLabel")
+label.Size = UDim2.new(1, 0, 0, 30)
+label.Text = "Digite a key:"
+label.Parent = frame
+
+local box = Instance.new("TextBox")
+box.Size = UDim2.new(0.8, 0, 0, 40)
+box.Position = UDim2.new(0.1, 0, 0.4, 0)
+box.Parent = frame
+
+local btn = Instance.new("TextButton")
+btn.Size = UDim2.new(0.4, 0, 0, 40)
+btn.Position = UDim2.new(0.3, 0, 0.7, 0)
+btn.Text = "Ativar"
+btn.Parent = frame
+
+btn.MouseButton1Click:Connect(function()
+    if box.Text == key then
+        gui:Destroy()
+        -- Seu script começa aqui
+        print("Key correta! Hub carregando...")
+    else
+        box.Text = ""
+        label.Text = "Key inválida! Tente novamente:"
+    end
+end)--[[
     DAVIROBLOX HUB | Night 3
     Auto Munição estilo RMUH, Teleports, Stamina, ESP Players, Fullbright
     ESP para Worker (Mutant) e Aranha (WorkerHead)
